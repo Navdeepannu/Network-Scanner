@@ -1,0 +1,13 @@
+Network Scan Results with Hostnames and Ports - 2025-08-06 12:43:37
+================================================================================
+
+Total active hosts: 4
+
+IP Address        Hostname                    Open Ports
+--------------------------------------------------------------------------------
+192.168.2.25    iphone                    No open ports detected
+192.168.2.1     mynetwork.home            No open ports detected
+192.168.2.136   136.2.168.192.in-addr.arpa No open ports detected
+192.168.2.136   136.2.168.192.in-addr.arpa No open ports detected
+
+================================================================================
