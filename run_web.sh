@@ -9,8 +9,8 @@ if ! python3 -c "import flask" 2>/dev/null; then
 fi
 
 echo "Starting web server..."
-echo "Open your browser and go to: http://localhost:5000"
+echo "Open your browser and go to: http://localhost:5003"
 echo "Press Ctrl+C to stop the server"
 echo ""
 
-python3 app.py
+python3 scanner.py

@@ -1,0 +1,471 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Network Scanner - Discover Active Devices</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Inter", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: #f5f5f5;
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+
+      .header {
+        background: #2a8fba;
+        color: white;
+        padding: 30px;
+        text-align: center;
+      }
+
+      .header h1 {
+        font-size: 2.2em;
+        margin-bottom: 8px;
+        font-weight: 600;
+      }
+
+      .header p {
+        font-size: 1.1em;
+        opacity: 0.9;
+        font-weight: 300;
+      }
+
+      .content {
+        padding: 30px;
+      }
+
+      .hotspot-examples {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 20px;
+        margin: 20px 0;
+        border: 1px solid #e9ecef;
+      }
+
+      .hotspot-examples h3 {
+        color: #333;
+        margin-bottom: 15px;
+        font-size: 1.2em;
+        font-weight: 600;
+      }
+
+      .hotspot-examples ul {
+        list-style: none;
+      }
+
+      .hotspot-examples li {
+        background: white;
+        margin: 8px 0;
+        padding: 12px 16px;
+        border-radius: 4px;
+        border-left: 3px solid #e9ecef;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border: 1px solid #e9ecef;
+      }
+
+      .hotspot-examples li:hover {
+        border-left-color: #38bdf8;
+        background: #f8fafc;
+        transform: translateX(2px);
+      }
+
+      .hotspot-examples strong {
+        color: #333;
+      }
+
+      .scan-section {
+        background: white;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        padding: 20px;
+        margin: 20px 0;
+      }
+
+      .input-group {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 20px;
+      }
+
+      #subnet {
+        flex: 1;
+        padding: 12px 16px;
+        border: 1px solid #d1d5db;
+        border-radius: 5px;
+        font-size: 16px;
+        transition: border-color 0.2s ease;
+        background: white;
+      }
+
+      #subnet:focus {
+        outline: none;
+        border-color: #101314;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+      }
+
+      .btn {
+        padding: 12px 24px;
+        background: #30a1d2;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+        min-width: 140px;
+      }
+
+      .btn:hover {
+        background: #35b1e7;
+    }
+
+      .btn:active {
+        background: #35b1e7;
+      }
+
+      .btn:disabled {
+        background: #9ca3af;
+        cursor: not-allowed;
+      }
+
+      #status {
+        margin: 20px 0;
+        padding: 16px;
+        background: #f8f9fa;
+        border-radius: 4px;
+        font-weight: 500;
+        text-align: center;
+        min-height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid #e9ecef;
+        color: #333;
+      }
+
+      .progress-bar {
+        width: 100%;
+        height: 6px;
+        background: #e9ecef;
+        border-radius: 3px;
+        margin-top: 12px;
+        overflow: hidden;
+      }
+
+      .progress-fill {
+        height: 100%;
+        background: #38bdf8;
+        width: 0%;
+        transition: width 0.3s ease;
+      }
+
+      .results {
+        margin-top: 20px;
+      }
+
+      .results h3 {
+        color: #333;
+        margin-bottom: 16px;
+        font-size: 1.3em;
+        font-weight: 600;
+      }
+
+      .device {
+        background: white;
+        border: 1px solid #e9ecef;
+        padding: 16px;
+        margin: 12px 0;
+        border-radius: 4px;
+        border-left: 4px solid #38bdf8;
+        transition: all 0.2s ease;
+      }
+
+      .device:hover {
+        transform: translateX(2px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .device-info {
+        display: grid;
+        grid-template-columns: 1fr 2fr 1fr;
+        gap: 16px;
+        align-items: center;
+      }
+
+      .device-ip {
+        font-family: "Monaco", "Menlo", "Consolas", monospace;
+        font-weight: 600;
+        color: #333;
+        font-size: 1em;
+      }
+
+      .device-hostname {
+        color: #666;
+        font-weight: 400;
+      }
+
+      .device-method {
+        background: #748ec5;
+        color: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.85em;
+        text-align: center;
+        font-weight: 500;
+      }
+
+      .loading {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        border: 2px solid #f3f3f3;
+        border-top: 2px solid #35b1e7;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-right: 8px;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .success {
+        background: #f0f9ff;
+        border: 1px solid #22c55e;
+        color: #166534;
+      }
+
+      .error {
+        background: #fef2f2;
+        border: 1px solid #ef4444;
+        color: #991b1b;
+      }
+
+      @media (max-width: 768px) {
+        .container {
+          margin: 10px;
+          border-radius: 4px;
+        }
+
+        .header h1 {
+          font-size: 1.8em;
+        }
+
+        .input-group {
+          flex-direction: column;
+        }
+
+        .device-info {
+          grid-template-columns: 1fr;
+          gap: 8px;
+          text-align: center;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>🌐 Network Scanner</h1>
+        <p>Discover active devices on your network</p>
+      </div>
+
+      <div class="content">
+        <div class="hotspot-examples">
+          <h3>Quick Select Networks</h3>
+          <ul>
+            <li onclick="fillSubnet('172.20.10.0/24')">
+              <strong>Hotspot:</strong> 172.20.10.0/24
+            </li>
+            <li onclick="fillSubnet('192.168.2.0/24')">
+              <strong>Home WiFi:</strong> 192.168.2.0/24
+            </li>
+            <li onclick="fillSubnet('192.168.0.0/24')">
+              <strong>Alternative Home:</strong> 192.168.0.0/24
+            </li>
+          </ul>
+        </div>
+
+        <div class="scan-section">
+          <div class="input-group">
+            <input
+              type="text"
+              id="subnet"
+              placeholder="Enter network subnet (e.g., 192.168.1.0/24)"
+            />
+            <button class="btn" onclick="startScan()" id="scanBtn">
+              Start Scan
+            </button>
+          </div>
+
+          <div id="status">
+            Ready to scan - Select a network or enter manually
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+        </div>
+
+        <div id="results" class="results"></div>
+      </div>
+
+     
+    <script>
+      let isScanning = false;
+
+      function fillSubnet(subnet) {
+        document.getElementById("subnet").value = subnet;
+        document.getElementById("subnet").focus();
+      }
+
+      function startScan() {
+        if (isScanning) return;
+
+        const subnet = document.getElementById("subnet").value.trim();
+        const status = document.getElementById("status");
+        const results = document.getElementById("results");
+        const scanBtn = document.getElementById("scanBtn");
+        const progressFill = document.getElementById("progressFill");
+
+        if (!subnet) {
+          status.innerHTML =
+            "Please enter a subnet or select one from above";
+          status.className = "error";
+          return;
+        }
+
+        isScanning = true;
+        scanBtn.disabled = true;
+        scanBtn.innerHTML = '<div class="loading"></div>Scanning...';
+        status.innerHTML = '<div class="loading"></div>Initializing scan...';
+        status.className = "";
+        results.innerHTML = "";
+        progressFill.style.width = "0%";
+
+        fetch("/scan", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ subnet: subnet }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.error) {
+              status.innerHTML = "❌ Error: " + data.error;
+              status.className = "error";
+              resetScanButton();
+            } else {
+              checkStatus();
+            }
+          })
+          .catch((error) => {
+            status.innerHTML = "❌ Network error: " + error.message;
+            status.className = "error";
+            resetScanButton();
+          });
+      }
+
+      function resetScanButton() {
+        isScanning = false;
+        const scanBtn = document.getElementById("scanBtn");
+        scanBtn.disabled = false;
+        scanBtn.innerHTML = "Start Scan";
+      }
+
+      function checkStatus() {
+        fetch("/status")
+          .then((response) => response.json())
+          .then((data) => {
+            const status = document.getElementById("status");
+            const progressFill = document.getElementById("progressFill");
+
+            status.innerHTML =
+              data.status_message + " (" + Math.round(data.progress) + "%)";
+            progressFill.style.width = data.progress + "%";
+
+            if (data.scanning) {
+              setTimeout(checkStatus, 1000);
+            } else {
+              resetScanButton();
+              showResults();
+            }
+          });
+      }
+
+      function showResults() {
+        fetch("/results")
+          .then((response) => response.json())
+          .then((data) => {
+            const results = document.getElementById("results");
+            const status = document.getElementById("status");
+
+            if (data.total_active === 0) {
+              results.innerHTML =
+                "<h3>No active devices found</h3><p>This could mean:</p><ul><li>No devices are currently active on this network</li><li>Devices may be blocking ICMP ping</li><li>Wrong network range selected</li></ul>";
+              status.innerHTML =
+                "Scan completed - No active devices detected";
+              status.className = "success";
+            } else {
+              results.innerHTML =
+                "<h3>Found " + data.total_active + " active device(s):</h3>";
+
+              data.active_hosts.forEach((host) => {
+                results.innerHTML += `
+                            <div class="device">
+                                <div class="device-info">
+                                    <div class="device-ip">${host.ip}</div>
+                                    <div class="device-hostname"> ${host.hostname || "Unknown"}</div>
+                                    <div class="device-method">${host.detection_method}</div>
+                                </div>
+                            </div>
+                        `;
+              });
+
+              status.innerHTML = `✅ Scan completed successfully - Found ${data.total_active} device(s)`;
+              status.className = "success";
+            }
+          });
+      }
+
+      // Allow Enter key to start scan
+      document
+        .getElementById("subnet")
+        .addEventListener("keypress", function (e) {
+          if (e.key === "Enter") {
+            startScan();
+          }
+        });
+
+      // Focus on input field when page loads
+      window.onload = function () {
+        document.getElementById("subnet").focus();
+      };
+    </script>
+  </body>
+</html>
